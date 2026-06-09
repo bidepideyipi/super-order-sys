@@ -1,0 +1,27 @@
+data/super_order.db
+
+frontend/node_modules/
+package-lock.json
+frontend/node_modules/*
+backend/config.json
+Claude.md
+
+bin/
+  *.exe
+  *.exe~
+  *.dll
+  *.so
+  *.dylib
+
+  # 忽略测试文件
+  *.test
+
+  # 忽略输出文件
+  *.out
+
+  # 依赖目录（如果使用 vendor 模式可忽略）
+  vendor/
+
+  # 工作区文件
+  go.work
+  go.work.sum

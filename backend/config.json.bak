@@ -1,0 +1,16 @@
+{
+  "server": {
+    "port": 8080,
+    "mode": "debug"
+  },
+  "database": {
+    "type": "sqlite",
+    "sqlite": "../data/super_order.db"
+  },
+  "oss": {
+    "endpoint": "",
+    "access_key_id": "",
+    "access_key_secret": "",
+    "bucket_name": ""
+  }
+}
