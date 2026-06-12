@@ -5,6 +5,8 @@ import (
 	"super-order-web/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // Setup 设置路由
@@ -13,7 +15,9 @@ func Setup(
 	skuCategoryHandler *handler.SKUCategoryHandler,
 	skuHandler *handler.SKUHandler,
 	orderHandler *handler.OrderHandler,
-	financialTransactionHandler *handler.FinancialTransactionHandler,
+	orderItemHandler *handler.OrderItemHandler,
+	financialHandler *handler.FinancialHandler,
+	commonHandler *handler.CommonHandler,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -23,57 +27,82 @@ func Setup(
 	// API路由组
 	api := router.Group("/api")
 	{
-		// 客户路由
-		customers := api.Group("/customers")
+		// ========== SKU 路由 ==========
+		sku := api.Group("/sku")
 		{
-			customers.GET("", customerHandler.List)
-			customers.GET("/:id", customerHandler.Get)
-			customers.POST("", customerHandler.Create)
-			customers.PUT("/:id", customerHandler.Update)
-			customers.DELETE("/:id", customerHandler.Delete)
+			sku.GET("/list", skuHandler.ListAll)
+			sku.GET("/list-paginated", skuHandler.ListPaginated)
+			sku.GET("/search", skuHandler.Search)
+			sku.GET("/search-paginated", skuHandler.SearchPaginated)
+			sku.GET("/search-with-category", skuHandler.SearchWithCategory)
+			sku.GET("/:id", skuHandler.Get)
+			sku.POST("", skuHandler.Create)
+			sku.PUT("/:id", skuHandler.Update)
+			sku.DELETE("/:id", skuHandler.Delete)
 		}
 
-		// SKU分类路由
-		skuCategories := api.Group("/sku-categories")
+		// ========== 分类路由 ==========
+		category := api.Group("/category")
 		{
-			skuCategories.GET("", skuCategoryHandler.List)
-			skuCategories.GET("/:id", skuCategoryHandler.Get)
-			skuCategories.POST("", skuCategoryHandler.Create)
-			skuCategories.PUT("/:id", skuCategoryHandler.Update)
-			skuCategories.DELETE("/:id", skuCategoryHandler.Delete)
+			category.GET("/list", skuCategoryHandler.List)
+			category.GET("/:id", skuCategoryHandler.Get)
+			category.POST("", skuCategoryHandler.Create)
+			category.PUT("/:id", skuCategoryHandler.Update)
+			category.DELETE("/:id", skuCategoryHandler.Delete)
 		}
 
-		// SKU路由
-		skus := api.Group("/skus")
+		// ========== 客户路由 ==========
+		customer := api.Group("/customer")
 		{
-			skus.GET("", skuHandler.List)
-			skus.GET("/all", skuHandler.ListAll)
-			skus.GET("/:id", skuHandler.Get)
-			skus.POST("", skuHandler.Create)
-			skus.PUT("/:id", skuHandler.Update)
-			skus.DELETE("/:id", skuHandler.Delete)
+			customer.GET("/list", customerHandler.List)
+			customer.GET("/:id", customerHandler.Get)
+			customer.POST("", customerHandler.Create)
+			customer.PUT("/:id", customerHandler.Update)
+			customer.DELETE("/:id", customerHandler.Delete)
 		}
 
-		// 订单路由
-		orders := api.Group("/orders")
+		// ========== 订单路由 ==========
+		order := api.Group("/order")
 		{
-			orders.GET("", orderHandler.List)
-			orders.GET("/:id", orderHandler.Get)
-			orders.POST("", orderHandler.Create)
-			orders.PUT("/:id", orderHandler.Update)
-			orders.PUT("/:id/status", orderHandler.UpdateStatus)
-			orders.DELETE("/:id", orderHandler.Delete)
-			orders.POST("/:id/settle", orderHandler.Settle)
+			order.GET("/list", orderHandler.List)
+			order.GET("/processing", orderHandler.GetProcessingOrders)
+			order.GET("/unsettled", orderHandler.GetUnsettledOrders)
+			order.GET("/:id", orderHandler.Get)
+			order.GET("/:id/items", orderHandler.GetItems)
+			order.POST("", orderHandler.Create)
+			order.PUT("/:id", orderHandler.Update)
+			order.DELETE("/:id", orderHandler.Delete)
 		}
 
-		// 财务流水路由
-		transactions := api.Group("/financial-transactions")
+		// ========== 订单明细路由 ==========
+		orderItem := api.Group("/order-item")
 		{
-			transactions.GET("", financialTransactionHandler.List)
-			transactions.GET("/balance", financialTransactionHandler.GetBalance)
-			transactions.POST("", financialTransactionHandler.Create)
+			orderItem.GET("/:id", orderItemHandler.Get)
+			orderItem.POST("", orderItemHandler.Create)
+			orderItem.PUT("/:id", orderItemHandler.Update)
+			orderItem.DELETE("/:id", orderItemHandler.Delete)
+		}
+
+		// ========== 财务路由 ==========
+		financial := api.Group("/financial")
+		{
+			financial.GET("/list", financialHandler.List)
+			financial.GET("/balance", financialHandler.GetBalance)
+			financial.GET("/:id", financialHandler.Get)
+			financial.POST("", financialHandler.Create)
+			financial.PUT("/:id", financialHandler.Update)
+			financial.DELETE("/:id", financialHandler.Delete)
+		}
+
+		// ========== 公共路由 ==========
+		common := api.Group("/common")
+		{
+			common.GET("/image/:skuCode", commonHandler.GetImage)
 		}
 	}
+
+	// Swagger UI
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }

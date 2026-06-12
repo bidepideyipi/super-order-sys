@@ -116,3 +116,30 @@ func (s *OrderService) Settle(id int64) error {
 		Where("id = ?", id).
 		Update("is_settled", true).Error
 }
+
+// GetByStatus 根据状态获取订单列表
+func (s *OrderService) GetByStatus(statuses []string) ([]model.Order, error) {
+	var orders []model.Order
+	err := s.db.Preload("Customer").Preload("Items.SKU").
+		Where("status IN ?", statuses).
+		Order("created_at DESC").
+		Find(&orders).Error
+	return orders, err
+}
+
+// GetUnsettled 获取未结算的订单
+func (s *OrderService) GetUnsettled() ([]model.Order, error) {
+	var orders []model.Order
+	err := s.db.Preload("Customer").Preload("Items.SKU").
+		Where("is_settled = ?", false).
+		Order("created_at DESC").
+		Find(&orders).Error
+	return orders, err
+}
+
+// GetItems 获取订单明细
+func (s *OrderService) GetItems(orderID int64) ([]model.OrderItem, error) {
+	var items []model.OrderItem
+	err := s.db.Preload("SKU").Where("order_id = ?", orderID).Find(&items).Error
+	return items, err
+}

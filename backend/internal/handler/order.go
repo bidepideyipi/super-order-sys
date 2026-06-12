@@ -36,7 +36,7 @@ type ListOrderRequest struct {
 // @Param page_size query int false "每页数量"
 // @Param status query string false "订单状态"
 // @Success 200 {object} response.Response
-// @Router /api/orders [get]
+// @Router /api/order/list [get]
 func (h *OrderHandler) List(c *gin.Context) {
 	var req ListOrderRequest
 	req.Page = 1
@@ -65,7 +65,7 @@ func (h *OrderHandler) List(c *gin.Context) {
 // @Produce json
 // @Param id path int true "订单ID"
 // @Success 200 {object} response.Response
-// @Router /api/orders/{id} [get]
+// @Router /api/order/{id} [get]
 func (h *OrderHandler) Get(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	order, err := h.service.GetByID(id)
@@ -103,7 +103,7 @@ type CreateOrderRequest struct {
 // @Produce json
 // @Param request body CreateOrderRequest true "订单信息"
 // @Success 200 {object} response.Response
-// @Router /api/orders [post]
+// @Router /api/order [post]
 func (h *OrderHandler) Create(c *gin.Context) {
 	var req CreateOrderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -158,7 +158,7 @@ type UpdateOrderRequest struct {
 // @Param id path int true "订单ID"
 // @Param request body UpdateOrderRequest true "订单信息"
 // @Success 200 {object} response.Response
-// @Router /api/orders/{id} [put]
+// @Router /api/order/{id} [put]
 func (h *OrderHandler) Update(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	var req UpdateOrderRequest
@@ -190,15 +190,7 @@ type UpdateStatusRequest struct {
 	Status string `json:"status" binding:"required"`
 }
 
-// UpdateStatus 更新订单状态
-// @Summary 更新订单状态
-// @Tags Order
-// @Accept json
-// @Produce json
-// @Param id path int true "订单ID"
-// @Param request body UpdateStatusRequest true "状态信息"
-// @Success 200 {object} response.Response
-// @Router /api/orders/{id}/status [put]
+// UpdateStatus 更新订单状态（未在路由中使用）
 func (h *OrderHandler) UpdateStatus(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	var req UpdateStatusRequest
@@ -222,7 +214,7 @@ func (h *OrderHandler) UpdateStatus(c *gin.Context) {
 // @Produce json
 // @Param id path int true "订单ID"
 // @Success 200 {object} response.Response
-// @Router /api/orders/{id} [delete]
+// @Router /api/order/{id} [delete]
 func (h *OrderHandler) Delete(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err := h.service.Delete(id); err != nil {
@@ -232,14 +224,7 @@ func (h *OrderHandler) Delete(c *gin.Context) {
 	response.Success(c, nil)
 }
 
-// Settle 订单结算
-// @Summary 订单结算
-// @Tags Order
-// @Accept json
-// @Produce json
-// @Param id path int true "订单ID"
-// @Success 200 {object} response.Response
-// @Router /api/orders/{id}/settle [post]
+// Settle 订单结算（未在路由中使用）
 func (h *OrderHandler) Settle(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err := h.service.Settle(id); err != nil {
@@ -247,4 +232,54 @@ func (h *OrderHandler) Settle(c *gin.Context) {
 		return
 	}
 	response.Success(c, nil)
+}
+
+// GetProcessingOrders 获取进行中的订单
+// @Summary 获取进行中的订单
+// @Tags Order
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response
+// @Router /api/order/processing [get]
+func (h *OrderHandler) GetProcessingOrders(c *gin.Context) {
+	orders, err := h.service.GetByStatus([]string{"pending", "confirmed"})
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	response.Success(c, orders)
+}
+
+// GetUnsettledOrders 获取未结算的订单
+// @Summary 获取未结算的订单
+// @Tags Order
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response
+// @Router /api/order/unsettled [get]
+func (h *OrderHandler) GetUnsettledOrders(c *gin.Context) {
+	orders, err := h.service.GetUnsettled()
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	response.Success(c, orders)
+}
+
+// GetItems 获取订单明细
+// @Summary 获取订单明细
+// @Tags Order
+// @Accept json
+// @Produce json
+// @Param id path int true "订单ID"
+// @Success 200 {object} response.Response
+// @Router /api/order/{id}/items [get]
+func (h *OrderHandler) GetItems(c *gin.Context) {
+	orderID, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	items, err := h.service.GetItems(orderID)
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	response.Success(c, items)
 }

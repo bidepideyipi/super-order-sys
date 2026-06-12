@@ -54,3 +54,31 @@ func (s *FinancialTransactionService) GetLatestBalance() (float64, error) {
 	}
 	return transaction.Balance, nil
 }
+
+// GetByID 根据ID获取财务流水
+func (s *FinancialTransactionService) GetByID(id int64) (*model.FinancialTransaction, error) {
+	var transaction model.FinancialTransaction
+	err := s.db.Where("id = ?", id).First(&transaction).Error
+	if err != nil {
+		return nil, err
+	}
+	return &transaction, nil
+}
+
+// Update 更新财务流水
+func (s *FinancialTransactionService) Update(transaction *model.FinancialTransaction) error {
+	return s.db.Model(&model.FinancialTransaction{}).
+		Where("id = ?", transaction.ID).
+		Updates(map[string]interface{}{
+			"category":      transaction.Category,
+			"description":   transaction.Description,
+			"amount_change": transaction.AmountChange,
+			"balance":       transaction.Balance,
+			"is_settled":    transaction.IsSettled,
+		}).Error
+}
+
+// Delete 删除财务流水
+func (s *FinancialTransactionService) Delete(id int64) error {
+	return s.db.Where("id = ?", id).Delete(&model.FinancialTransaction{}).Error
+}

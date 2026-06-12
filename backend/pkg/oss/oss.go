@@ -77,3 +77,15 @@ func GetObjectName(prefix, filename string) string {
 	}
 	return fmt.Sprintf("%s/%s%s", prefix, filename, ext)
 }
+
+// GetImageURL 生成SKU图片URL
+func GetImageURL(skuCode string) string {
+	cfg := config.Get()
+	if cfg.OSS.BucketName == "" || cfg.OSS.Endpoint == "" {
+		return ""
+	}
+	// 格式: sku/{sku_code}.jpeg
+	objectName := fmt.Sprintf("sku/%s.jpeg", skuCode)
+	// 返回完整的 OSS URL: https://{bucket}.{endpoint}/{objectName}
+	return fmt.Sprintf("https://%s.%s/%s", cfg.OSS.BucketName, cfg.OSS.Endpoint, objectName)
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+
 	"super-order-web/internal/config"
 	"super-order-web/internal/handler"
 	"super-order-web/internal/routes"
@@ -10,8 +11,29 @@ import (
 	"super-order-web/pkg/database"
 	"super-order-web/pkg/oss"
 
+	_ "super-order-web/docs"
 	"github.com/gin-gonic/gin"
 )
+
+// @title           超级订单管理系统 API
+// @version         1.0
+// @description     这是一个超级订单管理系统的后端 API 文档
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8173
+// @BasePath  /api
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	// 加载配置
@@ -42,6 +64,7 @@ func main() {
 	skuCategoryService := service.NewSKUCategoryService(db)
 	skuService := service.NewSKUService(db)
 	orderService := service.NewOrderService(db)
+	orderItemService := service.NewOrderItemService(db)
 	financialTransactionService := service.NewFinancialTransactionService(db)
 
 	// 初始化处理器
@@ -49,7 +72,9 @@ func main() {
 	skuCategoryHandler := handler.NewSKUCategoryHandler(skuCategoryService)
 	skuHandler := handler.NewSKUHandler(skuService)
 	orderHandler := handler.NewOrderHandler(orderService)
-	financialTransactionHandler := handler.NewFinancialTransactionHandler(financialTransactionService)
+	orderItemHandler := handler.NewOrderItemHandler(orderItemService)
+	financialHandler := handler.NewFinancialHandler(financialTransactionService)
+	commonHandler := handler.NewCommonHandler(skuService)
 
 	// 设置路由
 	router := routes.Setup(
@@ -57,7 +82,9 @@ func main() {
 		skuCategoryHandler,
 		skuHandler,
 		orderHandler,
-		financialTransactionHandler,
+		orderItemHandler,
+		financialHandler,
+		commonHandler,
 	)
 
 	// 启动服务器

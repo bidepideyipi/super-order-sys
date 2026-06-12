@@ -24,7 +24,7 @@ func NewSKUCategoryHandler(svc *service.SKUCategoryService) *SKUCategoryHandler 
 // @Accept json
 // @Produce json
 // @Success 200 {object} response.Response
-// @Router /api/sku-categories [get]
+// @Router /api/category/list [get]
 func (h *SKUCategoryHandler) List(c *gin.Context) {
 	categories, err := h.service.List()
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *SKUCategoryHandler) List(c *gin.Context) {
 // @Produce json
 // @Param id path string true "分类ID"
 // @Success 200 {object} response.Response
-// @Router /api/sku-categories/{id} [get]
+// @Router /api/category/{id} [get]
 func (h *SKUCategoryHandler) Get(c *gin.Context) {
 	id := c.Param("id")
 	category, err := h.service.GetByID(id)
@@ -64,7 +64,7 @@ type CreateCategoryRequest struct {
 // @Produce json
 // @Param request body CreateCategoryRequest true "分类信息"
 // @Success 200 {object} response.Response
-// @Router /api/sku-categories [post]
+// @Router /api/category [post]
 func (h *SKUCategoryHandler) Create(c *gin.Context) {
 	var req CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -97,7 +97,7 @@ type UpdateCategoryRequest struct {
 // @Param id path string true "分类ID"
 // @Param request body UpdateCategoryRequest true "分类信息"
 // @Success 200 {object} response.Response
-// @Router /api/sku-categories/{id} [put]
+// @Router /api/category/{id} [put]
 func (h *SKUCategoryHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateCategoryRequest
@@ -126,7 +126,7 @@ func (h *SKUCategoryHandler) Update(c *gin.Context) {
 // @Produce json
 // @Param id path string true "分类ID"
 // @Success 200 {object} response.Response
-// @Router /api/sku-categories/{id} [delete]
+// @Router /api/category/{id} [delete]
 func (h *SKUCategoryHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(id); err != nil {

@@ -1,0 +1,1046 @@
+basePath: /api
+definitions:
+  handler.CreateCategoryRequest:
+    properties:
+      category_name:
+        type: string
+    required:
+    - category_name
+    type: object
+  handler.CreateFinancialRequest:
+    properties:
+      amount_change:
+        type: number
+      category:
+        type: string
+      description:
+        type: string
+    required:
+    - amount_change
+    - category
+    type: object
+  handler.CreateOrderItemRequest:
+    properties:
+      cost_price:
+        type: number
+      order_id:
+        type: integer
+      product_name:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      sale_price:
+        type: number
+      sku_code:
+        type: string
+      sku_id:
+        type: integer
+      total_cost_amount:
+        type: number
+      total_sale_amount:
+        type: number
+    required:
+    - cost_price
+    - order_id
+    - product_name
+    - quantity
+    - sale_price
+    - sku_code
+    - total_cost_amount
+    - total_sale_amount
+    type: object
+  handler.CreateOrderRequest:
+    properties:
+      customer_id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/handler.OrderItemRequest'
+        minItems: 1
+        type: array
+      order_date:
+        type: string
+      remarks:
+        type: string
+    required:
+    - customer_id
+    - items
+    - order_date
+    type: object
+  handler.CreateRequest:
+    properties:
+      customer_name:
+        type: string
+    required:
+    - customer_name
+    type: object
+  handler.CreateSKURequest:
+    properties:
+      box_quantity:
+        type: integer
+      box_spec:
+        type: string
+      category_id:
+        type: string
+      cost_price:
+        type: number
+      description:
+        type: string
+      name:
+        type: string
+      sale_price:
+        type: number
+      sku_code:
+        type: string
+      spec:
+        type: string
+      unit:
+        type: string
+    required:
+    - category_id
+    - name
+    - sku_code
+    type: object
+  handler.OrderItemRequest:
+    properties:
+      cost_price:
+        type: number
+      product_name:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      sale_price:
+        type: number
+      sku_code:
+        type: string
+      sku_id:
+        type: integer
+      total_cost_amount:
+        type: number
+      total_sale_amount:
+        type: number
+    required:
+    - cost_price
+    - product_name
+    - quantity
+    - sale_price
+    - sku_code
+    - total_cost_amount
+    - total_sale_amount
+    type: object
+  handler.UpdateCategoryRequest:
+    properties:
+      category_name:
+        type: string
+    required:
+    - category_name
+    type: object
+  handler.UpdateFinancialRequest:
+    properties:
+      amount_change:
+        type: number
+      balance:
+        type: number
+      category:
+        type: string
+      description:
+        type: string
+      is_settled:
+        type: boolean
+    required:
+    - amount_change
+    - balance
+    - category
+    type: object
+  handler.UpdateOrderItemRequest:
+    properties:
+      cost_price:
+        type: number
+      product_name:
+        type: string
+      quantity:
+        minimum: 1
+        type: integer
+      sale_price:
+        type: number
+      settled_amount:
+        type: number
+      sku_code:
+        type: string
+      sku_id:
+        type: integer
+      total_cost_amount:
+        type: number
+      total_sale_amount:
+        type: number
+    required:
+    - cost_price
+    - product_name
+    - quantity
+    - sale_price
+    - sku_code
+    - total_cost_amount
+    - total_sale_amount
+    type: object
+  handler.UpdateOrderRequest:
+    properties:
+      customer_id:
+        type: string
+      order_date:
+        type: string
+      remarks:
+        type: string
+      status:
+        type: string
+      total_cost_amount:
+        type: number
+      total_sale_amount:
+        type: number
+    required:
+    - customer_id
+    - order_date
+    type: object
+  handler.UpdateRequest:
+    properties:
+      customer_name:
+        type: string
+    required:
+    - customer_name
+    type: object
+  handler.UpdateSKURequest:
+    properties:
+      box_quantity:
+        type: integer
+      box_spec:
+        type: string
+      category_id:
+        type: string
+      cost_price:
+        type: number
+      description:
+        type: string
+      name:
+        type: string
+      sale_price:
+        type: number
+      spec:
+        type: string
+      unit:
+        type: string
+    required:
+    - category_id
+    - name
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8173
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: 这是一个超级订单管理系统的后端 API 文档
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: 超级订单管理系统 API
+  version: "1.0"
+paths:
+  /api/category:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建SKU分类
+      tags:
+      - SKUCategory
+  /api/category/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除SKU分类
+      tags:
+      - SKUCategory
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取SKU分类详情
+      tags:
+      - SKUCategory
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 分类ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 分类信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新SKU分类
+      tags:
+      - SKUCategory
+  /api/category/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取SKU分类列表
+      tags:
+      - SKUCategory
+  /api/common/image/{skuCode}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: SKU编码
+        in: path
+        name: skuCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取SKU图片
+      tags:
+      - Common
+  /api/customer:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 客户信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建客户
+      tags:
+      - Customer
+  /api/customer/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除客户
+      tags:
+      - Customer
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取客户详情
+      tags:
+      - Customer
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 客户ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 客户信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新客户
+      tags:
+      - Customer
+  /api/customer/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取客户列表
+      tags:
+      - Customer
+  /api/financial:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 财务信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateFinancialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建财务
+      tags:
+      - Financial
+  /api/financial/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 财务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除财务
+      tags:
+      - Financial
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 财务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取财务详情
+      tags:
+      - Financial
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 财务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 财务信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateFinancialRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新财务
+      tags:
+      - Financial
+  /api/financial/balance:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取余额
+      tags:
+      - Financial
+  /api/financial/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - description: 分类
+        in: query
+        name: category
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取财务列表
+      tags:
+      - Financial
+  /api/order:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建订单
+      tags:
+      - Order
+  /api/order-item:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单明细信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateOrderItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建订单明细
+      tags:
+      - OrderItem
+  /api/order-item/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单明细ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除订单明细
+      tags:
+      - OrderItem
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单明细ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取订单明细
+      tags:
+      - OrderItem
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单明细ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 订单明细信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateOrderItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新订单明细
+      tags:
+      - OrderItem
+  /api/order/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除订单
+      tags:
+      - Order
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取订单详情
+      tags:
+      - Order
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 订单信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新订单
+      tags:
+      - Order
+  /api/order/{id}/items:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 订单ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取订单明细
+      tags:
+      - Order
+  /api/order/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      - description: 订单状态
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取订单列表
+      tags:
+      - Order
+  /api/order/processing:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取进行中的订单
+      tags:
+      - Order
+  /api/order/unsettled:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取未结算的订单
+      tags:
+      - Order
+  /api/sku:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: SKU信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreateSKURequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建SKU
+      tags:
+      - SKU
+  /api/sku/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: SKU ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除SKU
+      tags:
+      - SKU
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: SKU ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取SKU详情
+      tags:
+      - SKU
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: SKU ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: SKU信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateSKURequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 更新SKU
+      tags:
+      - SKU
+  /api/sku/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取所有SKU（不分页）
+      tags:
+      - SKU
+  /api/sku/list-paginated:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 分页获取SKU列表
+      tags:
+      - SKU
+  /api/sku/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 搜索SKU（不分页）
+      tags:
+      - SKU
+  /api/sku/search-paginated:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 分页搜索SKU
+      tags:
+      - SKU
+  /api/sku/search-with-category:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 分类ID
+        in: query
+        name: category_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 按分类搜索SKU
+      tags:
+      - SKU
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

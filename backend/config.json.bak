@@ -1,6 +1,6 @@
 {
   "server": {
-    "port": 8080,
+    "port": 8137,
     "mode": "debug"
   },
   "database": {

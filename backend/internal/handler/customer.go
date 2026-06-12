@@ -24,7 +24,7 @@ func NewCustomerHandler(svc *service.CustomerService) *CustomerHandler {
 // @Accept json
 // @Produce json
 // @Success 200 {object} response.Response
-// @Router /api/customers [get]
+// @Router /api/customer/list [get]
 func (h *CustomerHandler) List(c *gin.Context) {
 	customers, err := h.service.List()
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *CustomerHandler) List(c *gin.Context) {
 // @Produce json
 // @Param id path string true "客户ID"
 // @Success 200 {object} response.Response
-// @Router /api/customers/{id} [get]
+// @Router /api/customer/{id} [get]
 func (h *CustomerHandler) Get(c *gin.Context) {
 	id := c.Param("id")
 	customer, err := h.service.GetByID(id)
@@ -64,7 +64,7 @@ type CreateRequest struct {
 // @Produce json
 // @Param request body CreateRequest true "客户信息"
 // @Success 200 {object} response.Response
-// @Router /api/customers [post]
+// @Router /api/customer [post]
 func (h *CustomerHandler) Create(c *gin.Context) {
 	var req CreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -97,7 +97,7 @@ type UpdateRequest struct {
 // @Param id path string true "客户ID"
 // @Param request body UpdateRequest true "客户信息"
 // @Success 200 {object} response.Response
-// @Router /api/customers/{id} [put]
+// @Router /api/customer/{id} [put]
 func (h *CustomerHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateRequest
@@ -126,7 +126,7 @@ func (h *CustomerHandler) Update(c *gin.Context) {
 // @Produce json
 // @Param id path string true "客户ID"
 // @Success 200 {object} response.Response
-// @Router /api/customers/{id} [delete]
+// @Router /api/customer/{id} [delete]
 func (h *CustomerHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.service.Delete(id); err != nil {

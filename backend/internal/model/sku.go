@@ -18,7 +18,7 @@ type SKU struct {
 	IsDeleted   bool         `gorm:"column:is_deleted;default:0" json:"is_deleted"`
 	CreatedAt   time.Time    `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt   time.Time    `gorm:"column:updated_at" json:"updated_at"`
-	Category    *SKUCategory `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Category    *SKUCategory `gorm:"foreignKey:CategoryID;references:CategoryID" json:"category,omitempty"`
 }
 
 // TableName 指定表名

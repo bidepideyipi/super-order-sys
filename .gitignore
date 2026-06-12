@@ -1,27 +1,37 @@
 data/super_order.db
 
+# Frontend
 frontend/node_modules/
 package-lock.json
-frontend/node_modules/*
+
+# Backend
 backend/config.json
+backend/server
+backend/config.json.bak
+
+# IDE
 Claude.md
+.vscode/
+.idea/
 
+# Binaries
 bin/
-  *.exe
-  *.exe~
-  *.dll
-  *.so
-  *.dylib
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
-  # 忽略测试文件
-  *.test
+# Test files
+*.test
 
-  # 忽略输出文件
-  *.out
+# Output files
+*.out
 
-  # 依赖目录（如果使用 vendor 模式可忽略）
-  vendor/
+# Vendor directory
+vendor/
 
-  # 工作区文件
-  go.work
-  go.work.sum
+# Go workspace
+go.work
+go.work.sum
+backend/config.json.bak

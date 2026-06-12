@@ -9,7 +9,7 @@
           </div>
         </div>
       </template>
-      
+
       <div class="toolbar">
         <el-input
           v-model="searchKeyword"
@@ -22,7 +22,7 @@
           </template>
         </el-input>
       </div>
-      
+
       <el-table
         :data="filteredSKUs"
         border
@@ -32,11 +32,15 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="category_name" label="分类" width="100" />
+        <el-table-column prop="category_name" label="分类" width="100">
+          <template #default="{ row }">
+            {{ row.category_name || '-' }}
+          </template>
+        </el-table-column>
         <el-table-column label="商品信息" min-width="250">
           <template #default="{ row }">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <img v-if="row.sku_code" :src="getImageUrl(row.sku_code)" style="width: 32px; height: 32px; object-fit: cover;" />
+              <img v-if="row.image" :src="row.image" style="width: 32px; height: 32px; object-fit: cover;" />
               <span v-else>-</span>
               <div>
                 <div>{{ row.name }}</div>
@@ -68,7 +72,7 @@
           </template>
         </el-table-column>
       </el-table>
-      
+
       <div class="pagination-container" v-if="!isSearching">
         <el-pagination
           v-model:current-page="currentPage"
@@ -81,7 +85,7 @@
         />
       </div>
     </el-card>
-    
+
     <el-dialog
       v-model="dialogVisible"
       :title="dialogMode === 'add' ? '新增 SKU' : '编辑 SKU'"
@@ -97,7 +101,7 @@
               :on-change="handleImageChange"
               class="image-uploader"
             >
-              <img v-if="form.sku_code" :src="getImageUrl(form.sku_code)" class="image-preview" />
+              <img v-if="form.image" :src="form.image" class="image-preview" />
               <el-icon v-else class="image-uploader-icon"><Plus /></el-icon>
             </el-upload>
           </div>
@@ -158,7 +162,7 @@ const {
   currentPage,
   pageSize,
   total,
-  loadData: loadDataFromList,
+  loadData,
   handleSearch,
   handlePageChange,
   handleSizeChange
@@ -173,17 +177,8 @@ const {
   handleSave: saveForm
 } = useSKUForm();
 
-watch(() => form.value.box_quantity, (newVal) => {
-  if (newVal > 1) {
-    form.value.unit = '箱';
-  }
-});
-
 const {
-  imageUrls,
-  getImageUrl,
-  loadImageUrls,
-  handleImageChange: handleImageUpload
+  handleImageChange
 } = useSKUImage();
 
 const selectedRows = ref([]);
@@ -196,34 +191,11 @@ const filteredSKUs = computed(() => {
   return skus.value;
 });
 
-const loadData = async () => {
-  const data = await loadDataFromList();
-  await loadImageUrls(data);
-};
-
-const handleSearchWithImages = async () => {
-  const data = await handleSearch();
-  await loadImageUrls(data);
-};
-
-const handlePageChangeWithImages = async (page) => {
-  const data = await handlePageChange(page);
-  await loadImageUrls(data);
-};
-
-const handleSizeChangeWithImages = async (size) => {
-  const data = await handleSizeChange(size);
-  await loadImageUrls(data);
-};
-
 const handleAdd = () => {
   openAddDialog();
 };
 
-const handleEdit = async (row) => {
-  if (row.sku_code) {
-    await loadImageUrls([row]);
-  }
+const handleEdit = (row) => {
   openEditDialog(row);
 };
 
@@ -234,10 +206,10 @@ const handleDelete = async (id) => {
       cancelButtonText: '取消',
       type: 'warning'
     });
-    
+
     await window.tauriAPI.sku.delete(String(id));
     ElMessage.success('删除成功');
-    await handleSearchWithImages();
+    await loadData();
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败');
@@ -247,12 +219,7 @@ const handleDelete = async (id) => {
 };
 
 const handleSave = async () => {
-  await saveForm(() => handleSearchWithImages());
-};
-
-const handleImageChange = async (file) => {
-  const base64Data = await handleImageUpload(file);
-  form.value.image_file = base64Data;
+  await saveForm(() => loadData());
 };
 
 const handleSelectionChange = (selection) => {
