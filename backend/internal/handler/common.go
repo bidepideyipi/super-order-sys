@@ -2,6 +2,7 @@ package handler
 
 import (
 	"super-order-web/internal/service"
+	"super-order-web/pkg/oss"
 	"super-order-web/pkg/response"
 
 	"github.com/gin-gonic/gin"
@@ -40,12 +41,11 @@ func (h *CommonHandler) GetImage(c *gin.Context) {
 		return
 	}
 
-	// TODO: 从OSS获取图片URL
-	// 目前先返回空，后续可以集成OSS
+	imageURL := oss.GetImageURL(skuCode)
 	resp := GetImageResponse{
 		SKUCode:  skuCode,
-		ImageURL: "",
-		HasImage: false,
+		ImageURL: imageURL,
+		HasImage: imageURL != "",
 	}
 
 	response.Success(c, resp)

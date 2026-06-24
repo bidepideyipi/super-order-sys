@@ -10,9 +10,29 @@ const api = axios.create({
   }
 });
 
+// 请求拦截器：自动添加 token
+api.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器：处理 401 未授权
 api.interceptors.response.use(
   response => response,
   error => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      window.location.href = '#/login';
+    }
     console.error('API Error:', error);
     return Promise.reject(error);
   }
@@ -20,17 +40,17 @@ api.interceptors.response.use(
 
 const tauriAPI = {
   getVersion: () => Promise.resolve('1.0.0-web'),
-  
+
   openFile: async () => {
     console.warn('openFile not available in web version');
     return [];
   },
-  
+
   saveFile: async () => {
     console.warn('saveFile not available in web version');
     return null;
   },
-  
+
   openExternal: (url) => {
     window.open(url, '_blank');
   },

@@ -12,6 +12,13 @@ type Config struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	Database DatabaseConfig `mapstructure:"database"`
 	OSS      OSSConfig      `mapstructure:"oss"`
+	User     UserConfig     `mapstructure:"user"`
+}
+
+// UserConfig 用户配置
+type UserConfig struct {
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
 }
 
 // ServerConfig 服务器配置

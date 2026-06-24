@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"super-order-web/internal/config"
-	"super-order-web/internal/model"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -23,24 +22,18 @@ func Initialize(cfg *config.DatabaseConfig) error {
 		return fmt.Errorf("连接数据库失败: %w", err)
 	}
 
-	// 自动迁移
-	if err := AutoMigrate(); err != nil {
-		return fmt.Errorf("数据库迁移失败: %w", err)
+	// 获取底层的sql.DB
+	sqlDB, err := DB.DB()
+	if err != nil {
+		return fmt.Errorf("获取数据库连接失败: %w", err)
 	}
 
-	return nil
-}
+	// 设置SQLite参数
+	sqlDB.Exec("PRAGMA foreign_keys = ON")
+	sqlDB.Exec("PRAGMA journal_mode = WAL")
+	sqlDB.Exec("PRAGMA synchronous = NORMAL")
 
-// AutoMigrate 自动迁移表结构
-func AutoMigrate() error {
-	return DB.AutoMigrate(
-		&model.SKUCategory{},
-		&model.Customer{},
-		&model.FinancialTransaction{},
-		&model.SKU{},
-		&model.Order{},
-		&model.OrderItem{},
-	)
+	return nil
 }
 
 // GetDB 获取数据库实例

@@ -12,6 +12,12 @@ import (
 
 var client *oss.Client
 
+// GetBucketName 获取当前配置的Bucket名称
+func GetBucketName() string {
+	cfg := config.Get()
+	return cfg.OSS.BucketName
+}
+
 // Initialize 初始化OSS客户端
 func Initialize(cfg *config.OSSConfig) error {
 	if cfg.Endpoint == "" || cfg.AccessKeyID == "" || cfg.AccessKeySecret == "" {

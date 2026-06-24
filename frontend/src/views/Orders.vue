@@ -189,9 +189,12 @@ const handleEdit = (row) => {
 };
 
 const handleSave = async () => {
-  await saveForm(() => {
-    loadData();
-  });
+  try {
+    await saveForm();
+    await loadData();
+  } catch (error) {
+    // 错误已在 saveForm 中处理
+  }
 };
 
 onMounted(async () => {

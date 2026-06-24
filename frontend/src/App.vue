@@ -1,78 +1,8 @@
 <template>
-  <el-container class="app-container">
-    <el-header class="app-header">
-      <div class="header-left">
-        <h1>超级订单管理系统</h1>
-      </div>
-    </el-header>
-    
-    <el-container>
-      <el-aside width="200px" class="app-aside">
-        <el-menu
-          :default-active="activeMenu"
-          @select="handleMenuSelect"
-          class="sidebar-menu"
-        >
-          <el-menu-item index="/">
-            <el-icon><HomeFilled /></el-icon>
-            <span>首页</span>
-          </el-menu-item>
-          <el-menu-item index="/sku">
-            <el-icon><Goods /></el-icon>
-            <span>SKU 管理</span>
-          </el-menu-item>
-          <el-menu-item index="/orders">
-            <el-icon><Document /></el-icon>
-            <span>订单管理</span>
-          </el-menu-item>
-          <el-menu-item index="/purchases">
-            <el-icon><ShoppingCart /></el-icon>
-            <span>采购管理</span>
-          </el-menu-item>
-          <el-menu-item index="/settlement">
-            <el-icon><Coin /></el-icon>
-            <span>结算管理</span>
-          </el-menu-item>
-          <el-menu-item index="/financial">
-            <el-icon><Wallet /></el-icon>
-            <span>财务管理</span>
-          </el-menu-item>
-          <el-menu-item index="/customers">
-            <el-icon><User /></el-icon>
-            <span>客户管理</span>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-      
-      <el-main class="app-main">
-        <router-view />
-      </el-main>
-    </el-container>
-  </el-container>
+  <router-view />
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { HomeFilled, Goods, Document, User, ShoppingCart, Wallet, Coin } from '@element-plus/icons-vue';
-
-const router = useRouter();
-const route = useRoute();
-
-const activeMenu = ref(route.path);
-
-watch(() => route.path, (newPath) => {
-  console.log('Route path changed to:', newPath, 'current activeMenu:', activeMenu.value);
-  activeMenu.value = newPath;
-}, { immediate: true });
-
-const handleMenuSelect = (index) => {
-  console.log('Menu selected:', index, 'current route:', route.path, 'current activeMenu:', activeMenu.value);
-  activeMenu.value = index;
-  router.push(index).catch(err => {
-    console.error('Router push error:', err);
-  });
-};
 </script>
 
 <style>
@@ -89,81 +19,6 @@ body {
 #app {
   height: 100vh;
   overflow: hidden;
-}
-
-.app-container {
-  height: 100vh;
-}
-
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 0 24px;
-  height: 60px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 10;
-}
-
-.header-left h1 {
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.app-aside {
-  background: #ffffff;
-  border-right: 1px solid #e8eaec;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
-}
-
-.sidebar-menu {
-  border-right: none;
-  padding: 8px 0;
-}
-
-.sidebar-menu .el-menu-item {
-  margin: 4px 12px;
-  border-radius: 8px;
-  height: 44px;
-  line-height: 44px;
-  color: #606266;
-  transition: all 0.3s ease;
-}
-
-.sidebar-menu .el-menu-item:hover {
-  background-color: #f5f7fa;
-  color: #667eea;
-  transform: translateX(4px);
-}
-
-.sidebar-menu .el-menu-item.is-active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
-}
-
-.sidebar-menu .el-menu-item .el-icon {
-  margin-right: 8px;
-  font-size: 18px;
-}
-
-.sidebar-menu .el-menu-item span {
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.app-main {
-  padding: 24px;
-  background: linear-gradient(180deg, #f8f9fc 0%, #f0f2f5 100%);
-  overflow-y: auto;
 }
 
 .el-card {
@@ -218,7 +73,6 @@ body {
   font-weight: 600;
   padding: 14px 0;
 }
-
 
 .el-table td {
   padding: 12px 0;
@@ -298,5 +152,117 @@ body {
 .el-form-item__label {
   font-weight: 500;
   color: #333;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .el-card .el-card__header {
+    padding: 14px 16px;
+  }
+
+  .el-card .el-card__body {
+    padding: 16px;
+  }
+
+  .el-dialog {
+    width: 90% !important;
+    margin: 0 auto;
+  }
+
+  .el-dialog__header {
+    padding: 16px 20px;
+  }
+
+  .el-dialog__body {
+    padding: 16px 20px;
+  }
+
+  .el-dialog__title {
+    font-size: 16px;
+  }
+
+  /* 表格滚动 */
+  .el-table {
+    font-size: 12px;
+  }
+
+  .el-table th,
+  .el-table td {
+    padding: 8px 4px;
+  }
+
+  .el-table .cell {
+    padding: 0 4px;
+  }
+
+  /* 分页器 */
+  .el-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .el-pagination .el-pager li {
+    min-width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .el-pagination button {
+    min-width: 28px;
+    height: 28px;
+  }
+
+  /* 表单 */
+  .el-form-item {
+    margin-bottom: 16px;
+  }
+
+  .el-form-item__label {
+    font-size: 13px;
+  }
+
+  /* 按钮 */
+  .el-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* 输入框 */
+  .el-input__inner {
+    font-size: 14px;
+  }
+
+  /* 卡片响应式 */
+  .el-col {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .el-card .el-card__header {
+    padding: 12px;
+  }
+
+  .el-card .el-card__body {
+    padding: 12px;
+  }
+
+  .el-dialog {
+    width: 95% !important;
+  }
+
+  .el-dialog__body {
+    padding: 12px;
+  }
+
+  .el-table {
+    font-size: 11px;
+  }
+
+  /* 超小屏幕隐藏部分列 */
+  .el-table .small-hide {
+    display: none;
+  }
 }
 </style>

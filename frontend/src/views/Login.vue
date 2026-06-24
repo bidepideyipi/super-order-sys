@@ -3,17 +3,16 @@
     <el-card class="login-card">
       <template #header>
         <div class="card-header">
-          <h2>超级订单管理系统</h2>
+          <h2>马上发财</h2>
         </div>
       </template>
-      
+
       <el-form
         ref="loginFormRef"
         :model="loginForm"
         :rules="loginRules"
-        label-width="80px"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="" prop="username">
           <el-input
             v-model="loginForm.username"
             placeholder="请输入用户名"
@@ -21,8 +20,8 @@
             clearable
           />
         </el-form-item>
-        
-        <el-form-item label="密码" prop="password">
+
+        <el-form-item label="" prop="password">
           <el-input
             v-model="loginForm.password"
             type="password"
@@ -32,7 +31,7 @@
             @keyup.enter="handleLogin"
           />
         </el-form-item>
-        
+
         <el-form-item>
           <el-button
             type="primary"
@@ -77,7 +76,7 @@ const loginRules = {
 
 const handleLogin = async () => {
   if (!loginFormRef.value) return;
-  
+
   await loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true;
@@ -102,10 +101,12 @@ const handleLogin = async () => {
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
 }
 
 .login-card {
-  width: 450px;
+  width: 100%;
+  max-width: 450px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -122,5 +123,24 @@ const handleLogin = async () => {
 :deep(.el-card__header) {
   background-color: #f5f7fa;
   border-bottom: 1px solid #ebeef5;
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+  .login-card {
+    max-width: 100%;
+  }
+
+  .card-header h2 {
+    font-size: 20px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 14px;
+  }
+
+  :deep(.el-input__inner) {
+    font-size: 14px;
+  }
 }
 </style>

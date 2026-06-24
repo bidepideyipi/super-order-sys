@@ -59,24 +59,9 @@ func (s *OrderService) GetByOrderNo(orderNo string) (*model.Order, error) {
 }
 
 // Create 创建订单
-func (s *OrderService) Create(order *model.Order, items []model.OrderItem) error {
-	return s.db.Transaction(func(tx *gorm.DB) error {
-		order.OrderNo = util.GenerateOrderNo()
-
-		if err := tx.Create(order).Error; err != nil {
-			return err
-		}
-
-		for i := range items {
-			items[i].OrderID = order.ID
-		}
-
-		if err := tx.Create(&items).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
+func (s *OrderService) Create(order *model.Order) error {
+	order.OrderNo = util.GenerateOrderNo(order.CustomerID)
+	return s.db.Create(order).Error
 }
 
 // Update 更新订单

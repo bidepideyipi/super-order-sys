@@ -1,4 +1,5 @@
 data/super_order.db
+data/super_order_copy.db
 
 # Frontend
 frontend/node_modules/
@@ -35,3 +36,4 @@ vendor/
 go.work
 go.work.sum
 backend/config.json.bak
+frontend/dist/assets/*

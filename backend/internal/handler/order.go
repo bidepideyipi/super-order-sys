@@ -76,24 +76,11 @@ func (h *OrderHandler) Get(c *gin.Context) {
 	response.Success(c, order)
 }
 
-// OrderItemRequest 订单明细请求
-type OrderItemRequest struct {
-	SKUID          int64   `json:"sku_id"`
-	SKUCode        string  `json:"sku_code" binding:"required"`
-	ProductName    string  `json:"product_name" binding:"required"`
-	Quantity       int     `json:"quantity" binding:"required,min=1"`
-	CostPrice      float64 `json:"cost_price" binding:"required"`
-	SalePrice      float64 `json:"sale_price" binding:"required"`
-	TotalCostAmount float64 `json:"total_cost_amount" binding:"required"`
-	TotalSaleAmount float64 `json:"total_sale_amount" binding:"required"`
-}
-
 // CreateRequest 创建订单请求
 type CreateOrderRequest struct {
-	CustomerID string           `json:"customer_id" binding:"required"`
-	OrderDate  string           `json:"order_date" binding:"required"`
-	Remarks    string           `json:"remarks"`
-	Items      []OrderItemRequest `json:"items" binding:"required,min=1"`
+	CustomerID string `json:"customer_id" binding:"required"`
+	OrderDate  string `json:"order_date" binding:"required"`
+	Remarks    string `json:"remarks"`
 }
 
 // Create 创建订单
@@ -118,21 +105,7 @@ func (h *OrderHandler) Create(c *gin.Context) {
 		Status:     string(model.OrderStatusPending),
 	}
 
-	items := make([]model.OrderItem, len(req.Items))
-	for i, item := range req.Items {
-		items[i] = model.OrderItem{
-			SKUID:           item.SKUID,
-			SKUCode:         item.SKUCode,
-			ProductName:     item.ProductName,
-			Quantity:        item.Quantity,
-			CostPrice:       item.CostPrice,
-			SalePrice:       item.SalePrice,
-			TotalCostAmount: item.TotalCostAmount,
-			TotalSaleAmount: item.TotalSaleAmount,
-		}
-	}
-
-	if err := h.service.Create(order, items); err != nil {
+	if err := h.service.Create(order); err != nil {
 		response.Error(c, err)
 		return
 	}
@@ -242,7 +215,7 @@ func (h *OrderHandler) Settle(c *gin.Context) {
 // @Success 200 {object} response.Response
 // @Router /api/order/processing [get]
 func (h *OrderHandler) GetProcessingOrders(c *gin.Context) {
-	orders, err := h.service.GetByStatus([]string{"pending", "confirmed"})
+	orders, err := h.service.GetByStatus([]string{"processing"})
 	if err != nil {
 		response.Error(c, err)
 		return

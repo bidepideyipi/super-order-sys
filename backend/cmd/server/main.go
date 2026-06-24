@@ -9,6 +9,7 @@ import (
 	"super-order-web/internal/routes"
 	"super-order-web/internal/service"
 	"super-order-web/pkg/database"
+	"super-order-web/pkg/jwt"
 	"super-order-web/pkg/oss"
 
 	_ "super-order-web/docs"
@@ -43,6 +44,9 @@ func main() {
 	}
 	cfg := config.Get()
 
+	// 初始化JWT
+	jwt.Initialize(&cfg.User)
+
 	// 初始化数据库
 	if err := database.Initialize(&cfg.Database); err != nil {
 		log.Fatalf("初始化数据库失败: %v", err)
@@ -68,6 +72,7 @@ func main() {
 	financialTransactionService := service.NewFinancialTransactionService(db)
 
 	// 初始化处理器
+	authHandler := handler.NewAuthHandler(&cfg.User)
 	customerHandler := handler.NewCustomerHandler(customerService)
 	skuCategoryHandler := handler.NewSKUCategoryHandler(skuCategoryService)
 	skuHandler := handler.NewSKUHandler(skuService)
@@ -78,6 +83,7 @@ func main() {
 
 	// 设置路由
 	router := routes.Setup(
+		authHandler,
 		customerHandler,
 		skuCategoryHandler,
 		skuHandler,

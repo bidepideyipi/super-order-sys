@@ -15,8 +15,8 @@ export function useSKUImage() {
     }
     try {
       const result = await window.tauriAPI.sku.getImage(skuCode);
-      if (result && result.url) {
-        imageUrls.value[skuCode] = result.url;
+      if (result && result.image_url) {
+        imageUrls.value[skuCode] = result.image_url;
       }
     } catch (error) {
       console.error('Failed to load image for', skuCode, error);
@@ -29,8 +29,8 @@ export function useSKUImage() {
       if (sku.sku_code) {
         try {
           const result = await window.tauriAPI.sku.getImage(sku.sku_code);
-          if (result && result.url) {
-            urls[sku.sku_code] = result.url;
+          if (result && result.image_url) {
+            urls[sku.sku_code] = result.image_url;
           }
         } catch (error) {
           console.error('Failed to load image for', sku.sku_code, error);

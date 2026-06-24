@@ -2,7 +2,6 @@ package util
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
@@ -12,8 +11,9 @@ func GenerateCustomerID() string {
 }
 
 // GenerateOrderNo 生成订单号
-func GenerateOrderNo() string {
-	return fmt.Sprintf("SO%s%04d", time.Now().Format("20060102"), rand.Intn(10000))
+// 规则：customer_id + yyyyMMdd
+func GenerateOrderNo(customerID string) string {
+	return customerID + time.Now().Format("20060102")
 }
 
 // GenerateCategoryID 生成分类ID

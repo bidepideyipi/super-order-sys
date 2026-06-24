@@ -1,0 +1,48 @@
+package middleware
+
+import (
+	"net/http"
+	"strings"
+
+	"super-order-web/pkg/jwt"
+
+	"github.com/gin-gonic/gin"
+)
+
+// Auth JWT 认证中间件
+func Auth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "未提供认证信息",
+			})
+			c.Abort()
+			return
+		}
+
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "认证格式错误",
+			})
+			c.Abort()
+			return
+		}
+
+		claims, err := jwt.ParseToken(parts[1])
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "无效的认证信息",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Set("username", claims.Username)
+		c.Next()
+	}
+}

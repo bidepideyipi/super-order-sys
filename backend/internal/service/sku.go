@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"super-order-web/internal/model"
 	"super-order-web/pkg/oss"
 
@@ -67,13 +68,14 @@ func (s *SKUService) List(page, pageSize int) ([]SKUWithImage, int64, error) {
 }
 
 // GetByID 根据ID获取SKU
-func (s *SKUService) GetByID(id int64) (*model.SKU, error) {
+func (s *SKUService) GetByID(id int64) (*SKUWithImage, error) {
 	var sku model.SKU
 	err := s.db.Preload("Category").Where("id = ?", id).First(&sku).Error
 	if err != nil {
 		return nil, err
 	}
-	return &sku, nil
+	result := toSKUWithImage(sku)
+	return &result, nil
 }
 
 // GetByCode 根据编码获取SKU
@@ -86,9 +88,56 @@ func (s *SKUService) GetByCode(code string) (*model.SKU, error) {
 	return &sku, nil
 }
 
+// GenerateSKUCode 生成SKU编码
+// 规则：分类ID(2位) + 序号(4位，不足左补0)
+func (s *SKUService) GenerateSKUCode(categoryID string) (string, error) {
+	// 获取该分类下最大的ID
+	var maxID int64
+	err := s.db.Model(&model.SKU{}).
+		Where("category_id = ?", categoryID).
+		Select("COALESCE(MAX(id), 0)").
+		Scan(&maxID).Error
+	if err != nil {
+		return "", err
+	}
+
+	// 序号 = 最大ID + 1
+	seq := maxID + 1
+
+	// 分类ID取前2位作为分类编码
+	categoryCode := categoryID
+	if len(categoryCode) > 2 {
+		categoryCode = categoryCode[:2]
+	}
+	if len(categoryCode) < 2 {
+		categoryCode = "0" + categoryCode
+	}
+
+	// 序号补0到4位
+	seqStr := fmt.Sprintf("%04d", seq)
+
+	skuCode := categoryCode + seqStr
+	return skuCode, nil
+}
+
 // Create 创建SKU
 func (s *SKUService) Create(sku *model.SKU) error {
-	return s.db.Create(sku).Error
+	// 如果SKU编码为空，自动生成
+	if sku.SKUCode == "" {
+		skuCode, err := s.GenerateSKUCode(sku.CategoryID)
+		if err != nil {
+			return err
+		}
+		sku.SKUCode = skuCode
+	}
+
+	err := s.db.Create(sku).Error
+	if err != nil {
+		fmt.Printf("Create SKU error: %v, SKU: %+v\n", err, sku)
+	} else {
+		fmt.Printf("Create SKU success: ID=%d, SKUCode=%s\n", sku.ID, sku.SKUCode)
+	}
+	return err
 }
 
 // Update 更新SKU

@@ -92,6 +92,9 @@
       width="600px"
     >
       <el-form :model="form" label-width="100px">
+        <el-form-item label="SKU 编码" v-if="dialogMode === 'edit'">
+          <el-input v-model="form.sku_code" disabled />
+        </el-form-item>
         <el-form-item label="产品图片">
           <div class="image-upload-container">
             <el-upload
@@ -178,8 +181,18 @@ const {
 } = useSKUForm();
 
 const {
-  handleImageChange
+  handleImageChange: onImageChange
 } = useSKUImage();
+
+const handleImageChange = async (file) => {
+  try {
+    const base64 = await onImageChange(file);
+    form.value.image_file = base64;
+    form.value.image = URL.createObjectURL(file.raw);
+  } catch (error) {
+    console.error('Image change error:', error);
+  }
+};
 
 const selectedRows = ref([]);
 
@@ -219,7 +232,13 @@ const handleDelete = async (id) => {
 };
 
 const handleSave = async () => {
-  await saveForm(() => loadData());
+  try {
+    await saveForm();
+    // 确保保存成功后刷新列表
+    await loadData();
+  } catch (error) {
+    // 错误已在 saveForm 中处理
+  }
 };
 
 const handleSelectionChange = (selection) => {

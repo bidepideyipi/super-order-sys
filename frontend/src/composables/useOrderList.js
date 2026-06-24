@@ -11,8 +11,9 @@ export function useOrderList() {
   const loadData = async () => {
     try {
       console.log('开始加载订单数据');
-      orders.value = await window.tauriAPI.order.list();
-      total.value = orders.value.length;
+      const result = await window.tauriAPI.order.list();
+      orders.value = result.data || [];
+      total.value = result.total || 0;
       console.log('订单数据加载完成:', orders.value.length, '个订单');
       return orders.value;
     } catch (error) {

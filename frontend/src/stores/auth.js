@@ -19,10 +19,26 @@ export const useAuthStore = defineStore('auth', () => {
         })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
 
-      if (!response.ok || !data.success) {
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('JSON parse error:', text);
+        throw new Error('服务器响应格式错误');
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.message || '登录请求失败');
+      }
+
+      if (!data.success) {
         throw new Error(data.message || '登录失败');
+      }
+
+      if (!data.token) {
+        throw new Error('未获取到认证令牌');
       }
 
       token.value = data.token;

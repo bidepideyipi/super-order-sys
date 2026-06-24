@@ -44,7 +44,7 @@ export function useOrderForm() {
     dialogVisible.value = true;
   };
 
-  const handleSave = async (onSuccess) => {
+  const handleSave = async () => {
     try {
       const orderData = {
         customer_id: form.value.customer_id,
@@ -54,7 +54,7 @@ export function useOrderForm() {
         total_sale_amount: form.value.total_sale_amount,
         remarks: form.value.remarks
       };
-      
+
       if (dialogMode.value === 'add') {
         await window.tauriAPI.order.create(orderData);
         ElMessage.success('新增成功');
@@ -63,7 +63,6 @@ export function useOrderForm() {
         ElMessage.success('更新成功');
       }
       dialogVisible.value = false;
-      onSuccess?.();
     } catch (error) {
       ElMessage.error('保存失败');
       console.error(error);

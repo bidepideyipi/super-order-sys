@@ -11,6 +11,7 @@ import (
 
 // Setup 设置路由
 func Setup(
+	authHandler *handler.AuthHandler,
 	customerHandler *handler.CustomerHandler,
 	skuCategoryHandler *handler.SKUCategoryHandler,
 	skuHandler *handler.SKUHandler,
@@ -27,8 +28,17 @@ func Setup(
 	// API路由组
 	api := router.Group("/api")
 	{
+		// ========== 认证路由 ==========
+		auth := api.Group("/auth")
+		{
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/logout", authHandler.Logout)
+			auth.GET("/check", middleware.Auth(), authHandler.Check)
+		}
+
 		// ========== SKU 路由 ==========
 		sku := api.Group("/sku")
+		sku.Use(middleware.Auth())
 		{
 			sku.GET("/list", skuHandler.ListAll)
 			sku.GET("/list-paginated", skuHandler.ListPaginated)
@@ -43,6 +53,7 @@ func Setup(
 
 		// ========== 分类路由 ==========
 		category := api.Group("/category")
+		category.Use(middleware.Auth())
 		{
 			category.GET("/list", skuCategoryHandler.List)
 			category.GET("/:id", skuCategoryHandler.Get)
@@ -53,6 +64,7 @@ func Setup(
 
 		// ========== 客户路由 ==========
 		customer := api.Group("/customer")
+		customer.Use(middleware.Auth())
 		{
 			customer.GET("/list", customerHandler.List)
 			customer.GET("/:id", customerHandler.Get)
@@ -63,6 +75,7 @@ func Setup(
 
 		// ========== 订单路由 ==========
 		order := api.Group("/order")
+		order.Use(middleware.Auth())
 		{
 			order.GET("/list", orderHandler.List)
 			order.GET("/processing", orderHandler.GetProcessingOrders)
@@ -76,6 +89,7 @@ func Setup(
 
 		// ========== 订单明细路由 ==========
 		orderItem := api.Group("/order-item")
+		orderItem.Use(middleware.Auth())
 		{
 			orderItem.GET("/:id", orderItemHandler.Get)
 			orderItem.POST("", orderItemHandler.Create)
@@ -85,6 +99,7 @@ func Setup(
 
 		// ========== 财务路由 ==========
 		financial := api.Group("/financial")
+		financial.Use(middleware.Auth())
 		{
 			financial.GET("/list", financialHandler.List)
 			financial.GET("/balance", financialHandler.GetBalance)

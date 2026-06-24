@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"encoding/base64"
+	"fmt"
 	"strconv"
+	"strings"
 	"super-order-web/internal/model"
 	"super-order-web/internal/service"
+	"super-order-web/pkg/oss"
 	"super-order-web/pkg/response"
 	"super-order-web/pkg/util"
 
@@ -83,7 +87,6 @@ func (h *SKUHandler) Get(c *gin.Context) {
 
 // CreateRequest 创建SKU请求
 type CreateSKURequest struct {
-	SKUCode     string  `json:"sku_code" binding:"required"`
 	Name        string  `json:"name" binding:"required"`
 	Description string  `json:"description"`
 	Spec        string  `json:"spec"`
@@ -93,6 +96,7 @@ type CreateSKURequest struct {
 	BoxQuantity int     `json:"box_quantity"`
 	CostPrice   float64 `json:"cost_price"`
 	SalePrice   float64 `json:"sale_price"`
+	ImageBase64 string  `json:"image_base64"`
 }
 
 // Create 创建SKU
@@ -111,7 +115,6 @@ func (h *SKUHandler) Create(c *gin.Context) {
 	}
 
 	sku := &model.SKU{
-		SKUCode:     req.SKUCode,
 		Name:        req.Name,
 		Description: req.Description,
 		Spec:        req.Spec,
@@ -130,12 +133,39 @@ func (h *SKUHandler) Create(c *gin.Context) {
 		sku.BoxQuantity = 1
 	}
 
+	// 先生成SKU编码
+	skuCode, err := h.service.GenerateSKUCode(req.CategoryID)
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	sku.SKUCode = skuCode
+
+	// 上传图片到OSS
+	imageURL := ""
+	if req.ImageBase64 != "" {
+		url, err := uploadImageToOSS(sku.SKUCode, req.ImageBase64)
+		if err != nil {
+			response.Fail(c, "图片上传失败: "+err.Error())
+			return
+		}
+		imageURL = url
+	}
+
 	if err := h.service.Create(sku); err != nil {
 		response.Error(c, err)
 		return
 	}
 
-	response.Success(c, sku)
+	// 返回包含图片URL的数据
+	result := map[string]interface{}{
+		"id":           sku.ID,
+		"sku_code":     sku.SKUCode,
+		"name":         sku.Name,
+		"image":        imageURL,
+		"category_name": "",
+	}
+	response.Success(c, result)
 }
 
 // UpdateRequest 更新SKU请求
@@ -149,6 +179,7 @@ type UpdateSKURequest struct {
 	BoxQuantity int     `json:"box_quantity"`
 	CostPrice   float64 `json:"cost_price"`
 	SalePrice   float64 `json:"sale_price"`
+	ImageBase64 string  `json:"image_base64"`
 }
 
 // Update 更新SKU
@@ -166,6 +197,22 @@ func (h *SKUHandler) Update(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Fail(c, "参数错误: "+err.Error())
 		return
+	}
+
+	// 获取SKU信息以便上传图片
+	skuInfo, err := h.service.GetByID(id)
+	if err != nil {
+		response.Fail(c, "SKU不存在")
+		return
+	}
+
+	// 上传图片到OSS
+	if req.ImageBase64 != "" {
+		_, err := uploadImageToOSS(skuInfo.SKUCode, req.ImageBase64)
+		if err != nil {
+			response.Fail(c, "图片上传失败: "+err.Error())
+			return
+		}
 	}
 
 	sku := &model.SKU{
@@ -187,6 +234,39 @@ func (h *SKUHandler) Update(c *gin.Context) {
 	}
 
 	response.Success(c, nil)
+}
+
+// uploadImageToOSS 上传图片到OSS
+func uploadImageToOSS(skuCode, imageBase64 string) (string, error) {
+	// 解码base64
+	base64Data := imageBase64
+	if strings.HasPrefix(base64Data, "data:image/") {
+		// 移除 data:image/xxx;base64, 前缀
+		parts := strings.SplitN(base64Data, ",", 2)
+		if len(parts) == 2 {
+			base64Data = parts[1]
+		}
+	}
+
+	// 解码base64
+	imageBytes, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return "", err
+	}
+
+	// 上传到OSS，路径为 sku/{sku_code}.jpeg
+	bucketName := oss.GetBucketName()
+	if bucketName == "" {
+		return "", nil // OSS未配置，返回空URL
+	}
+
+	objectName := fmt.Sprintf("sku/%s.jpeg", skuCode)
+	url, err := oss.UploadBytes(bucketName, objectName, imageBytes)
+	if err != nil {
+		return "", err
+	}
+
+	return url, nil
 }
 
 // Delete 删除SKU

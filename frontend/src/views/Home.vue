@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <el-col :span="6">
         <el-card class="stat-card">
-          <el-statistic title="总 SKU 数量" :value="stats.totalSKU" />
+          <el-statistic title="SKU总数" :value="stats.totalSKU" />
         </el-card>
       </el-col>
       <el-col :span="6">
@@ -24,7 +24,7 @@
     </el-row>
     
     <el-row :gutter="20" style="margin-top: 20px;">
-      <el-col :span="12">
+      <el-col :span="24">
         <el-card>
           <template #header>
             <span>分类统计</span>
@@ -36,7 +36,7 @@
           </el-table>
         </el-card>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="24">
         <el-card>
           <template #header>
             <span>欢迎使用</span>
