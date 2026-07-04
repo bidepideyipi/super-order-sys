@@ -27,6 +27,53 @@ type ListOrderRequest struct {
 	Status   string `form:"status"`
 }
 
+// OrderItemResponse 订单明细响应（扁平化SKU字段）
+type OrderItemResponse struct {
+	ID               int64   `json:"id"`
+	OrderID          int64   `json:"order_id"`
+	SKUID            int64   `json:"sku_id"`
+	SKUCode          string  `json:"sku_code"`
+	ProductName      string  `json:"product_name"`
+	Spec             string  `json:"spec"`
+	Unit             string  `json:"unit"`
+	BoxSpec          string  `json:"box_spec"`
+	BoxQuantity      int     `json:"box_quantity"`
+	Quantity         int     `json:"quantity"`
+	CostPrice        float64 `json:"cost_price"`
+	SalePrice        float64 `json:"sale_price"`
+	TotalCostAmount  float64 `json:"total_cost_amount"`
+	TotalSaleAmount  float64 `json:"total_sale_amount"`
+	SettledAmount    float64 `json:"settled_amount"`
+}
+
+// ToOrderItemResponse 将 model.OrderItem 转换为 OrderItemResponse
+func ToOrderItemResponse(item model.OrderItem) OrderItemResponse {
+	resp := OrderItemResponse{
+		ID:               item.ID,
+		OrderID:          item.OrderID,
+		SKUID:            item.SKUID,
+		SKUCode:          item.SKUCode,
+		ProductName:      item.ProductName,
+		Spec:             "",
+		Unit:             "个",
+		BoxSpec:          "",
+		BoxQuantity:      1,
+		Quantity:         item.Quantity,
+		CostPrice:        item.CostPrice,
+		SalePrice:        item.SalePrice,
+		TotalCostAmount:  item.TotalCostAmount,
+		TotalSaleAmount:  item.TotalSaleAmount,
+		SettledAmount:    item.SettledAmount,
+	}
+	if item.SKU != nil {
+		resp.Spec = item.SKU.Spec
+		resp.Unit = item.SKU.Unit
+		resp.BoxSpec = item.SKU.BoxSpec
+		resp.BoxQuantity = item.SKU.BoxQuantity
+	}
+	return resp
+}
+
 // List 获取订单列表
 // @Summary 获取订单列表
 // @Tags Order
@@ -254,5 +301,11 @@ func (h *OrderHandler) GetItems(c *gin.Context) {
 		response.Error(c, err)
 		return
 	}
-	response.Success(c, items)
+
+	// 转换为扁平化的响应结构
+	resp := make([]OrderItemResponse, len(items))
+	for i, item := range items {
+		resp[i] = ToOrderItemResponse(item)
+	}
+	response.Success(c, resp)
 }

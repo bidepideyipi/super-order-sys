@@ -37,3 +37,6 @@ go.work
 go.work.sum
 backend/config.json.bak
 frontend/dist/assets/*
+data/super_order.db-shm
+data/super_order.db-wal
+data/super_order.db.backup
