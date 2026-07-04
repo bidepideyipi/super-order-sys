@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	customtime "super-order-web/pkg/time"
+)
 
 // Order 订单
 type Order struct {
@@ -13,8 +15,8 @@ type Order struct {
 	TotalCostAmount float64        `gorm:"column:total_cost_amount;default:0" json:"total_cost_amount"`
 	TotalSaleAmount float64        `gorm:"column:total_sale_amount;default:0" json:"total_sale_amount"`
 	Remarks         string         `gorm:"column:remarks;type:TEXT" json:"remarks"`
-	CreatedAt       time.Time      `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt       time.Time      `gorm:"column:updated_at" json:"updated_at"`
+	CreatedAt       customtime.CustomTime `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt       customtime.CustomTime `gorm:"column:updated_at" json:"updated_at"`
 	Customer        *Customer      `gorm:"foreignKey:CustomerID" json:"customer,omitempty"`
 	Items           []OrderItem   `gorm:"foreignKey:OrderID" json:"items,omitempty"`
 }

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	customtime "super-order-web/pkg/time"
+)
 
 // SKU 商品
 type SKU struct {
@@ -16,8 +18,8 @@ type SKU struct {
 	CostPrice   float64      `gorm:"column:cost_price;default:0" json:"cost_price"`
 	SalePrice   float64      `gorm:"column:sale_price;default:0" json:"sale_price"`
 	IsDeleted   bool         `gorm:"column:is_deleted;default:0" json:"is_deleted"`
-	CreatedAt   time.Time    `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt   time.Time    `gorm:"column:updated_at" json:"updated_at"`
+	CreatedAt   customtime.CustomTime `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt   customtime.CustomTime `gorm:"column:updated_at" json:"updated_at"`
 	Category    *SKUCategory `gorm:"foreignKey:CategoryID;references:CategoryID" json:"category,omitempty"`
 }
 

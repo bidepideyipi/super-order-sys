@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	customtime "super-order-web/pkg/time"
+)
 
 // OrderItem 订单明细
 type OrderItem struct {
@@ -15,7 +17,7 @@ type OrderItem struct {
 	TotalCostAmount  float64  `gorm:"column:total_cost_amount;not null" json:"total_cost_amount"`
 	TotalSaleAmount  float64  `gorm:"column:total_sale_amount;not null" json:"total_sale_amount"`
 	SettledAmount    float64  `gorm:"column:settled_amount;default:0" json:"settled_amount"`
-	CreatedAt        time.Time `gorm:"column:created_at" json:"created_at"`
+	CreatedAt        customtime.CustomTime `gorm:"column:created_at" json:"created_at"`
 	Order            *Order   `gorm:"foreignKey:OrderID" json:"-"`
 	SKU              *SKU     `gorm:"foreignKey:SKUID" json:"sku,omitempty"`
 }

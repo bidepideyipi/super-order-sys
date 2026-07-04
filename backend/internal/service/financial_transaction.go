@@ -1,7 +1,9 @@
 package service
 
 import (
+	"time"
 	"super-order-web/internal/model"
+	customtime "super-order-web/pkg/time"
 
 	"gorm.io/gorm"
 )
@@ -37,8 +39,16 @@ func (s *FinancialTransactionService) List(page, pageSize int, category string) 
 	return transactions, total, err
 }
 
+// ListAll 获取所有财务流水
+func (s *FinancialTransactionService) ListAll() ([]model.FinancialTransaction, error) {
+	var transactions []model.FinancialTransaction
+	err := s.db.Order("created_at DESC").Find(&transactions).Error
+	return transactions, err
+}
+
 // Create 创建财务流水
 func (s *FinancialTransactionService) Create(transaction *model.FinancialTransaction) error {
+	transaction.CreatedAt = customtime.NewCustomTime(time.Now())
 	return s.db.Create(transaction).Error
 }
 

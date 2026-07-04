@@ -5,7 +5,6 @@ import (
 	"super-order-web/internal/model"
 	"super-order-web/internal/service"
 	"super-order-web/pkg/response"
-	"super-order-web/pkg/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,24 +37,12 @@ type ListFinancialRequest struct {
 // @Success 200 {object} response.Response
 // @Router /api/financial/list [get]
 func (h *FinancialHandler) List(c *gin.Context) {
-	var req ListFinancialRequest
-	req.Page = 1
-	req.PageSize = 10
-	req.Category = "all"
-	c.ShouldBindQuery(&req)
-
-	transactions, total, err := h.service.List(req.Page, req.PageSize, req.Category)
+	transactions, err := h.service.ListAll()
 	if err != nil {
 		response.Error(c, err)
 		return
 	}
-
-	response.Success(c, util.PageResponse{
-		Total:    total,
-		Page:     req.Page,
-		PageSize: req.PageSize,
-		Data:     transactions,
-	})
+	response.Success(c, transactions)
 }
 
 // Get 获取财务详情

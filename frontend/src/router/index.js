@@ -49,11 +49,6 @@ const routes = [
         name: 'Financial',
         component: () => import('../views/Financial.vue')
       },
-      {
-        path: 'test-tauri',
-        name: 'TestTauri',
-        component: () => import('../views/TestTauri.vue')
-      }
     ]
   }
 ];
