@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 // Financial transaction category constants
 export const FINANCIAL_CATEGORY_ADVANCE_PAYMENT = '预收货款';

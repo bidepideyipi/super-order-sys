@@ -8,9 +8,8 @@ import html2pdf from 'html2pdf.js';
  * @param {Ref} options.selectedOrderId 当前选中的订单ID
  * @param {Ref} options.orderItems 订单明细列表
  * @param {Ref} options.imageUrls 图片URL映射
- * @param {Ref} options.latestBalance 最新余额
  */
-export function useSettlementExport({ processingOrders, selectedOrderId, orderItems, imageUrls, latestBalance }) {
+export function useSettlementExport({ processingOrders, selectedOrderId, orderItems, imageUrls }) {
   const getImageUrl = (skuCode) => {
     if (!skuCode) return '';
     return imageUrls.value ? imageUrls.value[skuCode] || '' : '';
@@ -22,11 +21,6 @@ export function useSettlementExport({ processingOrders, selectedOrderId, orderIt
     const specHtml = item.box_quantity > 1 
       ? `${item.spec || ''}*${item.box_spec}/${item.unit}`
       : `${item.spec || ''}/${item.unit}`;
-    
-    let balance = latestBalance.value;
-    for (let i = 0; i <= index; i++) {
-      balance -= orderItems.value[i].total_cost_amount;
-    }
     
     return `
       <tr>
@@ -57,12 +51,12 @@ export function useSettlementExport({ processingOrders, selectedOrderId, orderIt
         <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;">
           <div>¥${(item.total_sale_amount - item.total_cost_amount).toFixed(2)}</div>
         </td>
-        <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;">¥${balance.toFixed(2)}</td>
+        <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;">¥${item.settled_amount.toFixed(2)}</td>
       </tr>
     `;
   };
 
-  const generateTableHtml = (title, rows, totalCost, totalSale, totalProfit, currentPage, totalPages) => `
+  const generateTableHtml = (title, rows, totalCost, lastBalance, totalSale, totalProfit, currentPage, totalPages) => `
     <div style="padding: 10px;">
       <h2 style="text-align: center; margin-bottom: 30px;">${title}</h2>
       <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
@@ -90,8 +84,10 @@ export function useSettlementExport({ processingOrders, selectedOrderId, orderIt
             </td>
             <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;">
               <div style="color: #FFB800; font-weight: bold;">¥${totalProfit.toFixed(2)}</div>
+              <div style="color: #FFB800; font-weight: bold;">¥${(totalProfit*0.5).toFixed(2)}</div>
             </td>
-            <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;">-</td>
+            
+            <td style="border: 1px solid #dcdfe6; padding: 6px; text-align: right;"> ¥${(lastBalance-(totalProfit*0.5)).toFixed(2)}</td>
           </tr>
           ` : `
           <tr style="background-color: #f5f7fa; font-weight: bold;">
@@ -121,6 +117,7 @@ export function useSettlementExport({ processingOrders, selectedOrderId, orderIt
       const totalCost = orderItems.value.reduce((sum, item) => sum + item.total_cost_amount, 0);
       const totalSale = orderItems.value.reduce((sum, item) => sum + item.total_sale_amount, 0);
       const totalProfit = totalSale - totalCost;
+      const lastBalance = orderItems.value.at(-1)?.settled_amount ||0;
       
       const pageSize = 20;
       const totalPages = Math.ceil(orderItems.value.length / pageSize);
@@ -133,7 +130,7 @@ export function useSettlementExport({ processingOrders, selectedOrderId, orderIt
         const pageItems = orderItems.value.slice(startIndex, endIndex);
         
         const rows = pageItems.map((item, index) => generateRowHtml(item, startIndex + index)).join('');
-        const tableHtml = generateTableHtml(`${orderNo} - 结算明细单`, rows, totalCost, totalSale, totalProfit, page + 1, totalPages);
+        const tableHtml = generateTableHtml(`${orderNo} - 结算明细单`, rows, totalCost, lastBalance, totalSale, totalProfit, page + 1, totalPages);
         
         allPagesHtml += tableHtml;
         

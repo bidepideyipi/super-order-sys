@@ -12,12 +12,16 @@ import (
 
 // OrderHandler 订单处理器
 type OrderHandler struct {
-	service *service.OrderService
+	service                      *service.OrderService
+	financialTransactionService *service.FinancialTransactionService
 }
 
 // NewOrderHandler 创建订单处理器
-func NewOrderHandler(svc *service.OrderService) *OrderHandler {
-	return &OrderHandler{service: svc}
+func NewOrderHandler(svc *service.OrderService, financialSvc *service.FinancialTransactionService) *OrderHandler {
+	return &OrderHandler{
+		service:                      svc,
+		financialTransactionService: financialSvc,
+	}
 }
 
 // ListRequest 获取订单列表请求
@@ -165,6 +169,7 @@ type UpdateOrderRequest struct {
 	CustomerID      string  `json:"customer_id" binding:"required"`
 	OrderDate       string  `json:"order_date" binding:"required"`
 	Status          string  `json:"status"`
+	IsSettled       bool    `json:"is_settled"`
 	TotalCostAmount float64 `json:"total_cost_amount"`
 	TotalSaleAmount float64 `json:"total_sale_amount"`
 	Remarks         string  `json:"remarks"`
@@ -192,6 +197,7 @@ func (h *OrderHandler) Update(c *gin.Context) {
 		CustomerID:      req.CustomerID,
 		OrderDate:       req.OrderDate,
 		Status:          req.Status,
+		IsSettled:       req.IsSettled,
 		TotalCostAmount: req.TotalCostAmount,
 		TotalSaleAmount: req.TotalSaleAmount,
 		Remarks:         req.Remarks,
@@ -302,10 +308,20 @@ func (h *OrderHandler) GetItems(c *gin.Context) {
 		return
 	}
 
+	// 获取最新余额
+	lastBalance, err := h.financialTransactionService.GetLatestBalance()
+	if err != nil {
+		lastBalance = 0
+	}
+
 	// 转换为扁平化的响应结构
 	resp := make([]OrderItemResponse, len(items))
 	for i, item := range items {
 		resp[i] = ToOrderItemResponse(item)
 	}
-	response.Success(c, resp)
+
+	response.Success(c, map[string]interface{}{
+		"items":       resp,
+		"last_balance": lastBalance,
+	})
 }

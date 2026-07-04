@@ -67,19 +67,17 @@ export function useSettlementList() {
 
     try {
       const order = await window.tauriAPI.order.get(String(orderId));
-      
+
       const orderWithCustomerName = {
         ...order,
         customer_name: getCustomerNameById(order.customer_id)
       };
-      
+
       currentOrder.value = orderWithCustomerName;
 
-      const items = await window.tauriAPI.purchase.getOrderItems(String(orderId));
-      orderItems.value = items;
-      
-      // 加载最新余额
-      await loadLatestBalance();
+      const result = await window.tauriAPI.purchase.getOrderItems(String(orderId));
+      orderItems.value = result.items || [];
+      latestBalance.value = result.last_balance || 0;
     } catch (error) {
       console.error('加载订单详情失败:', error);
       ElMessage.error('加载订单详情失败');

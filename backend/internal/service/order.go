@@ -66,16 +66,38 @@ func (s *OrderService) Create(order *model.Order) error {
 
 // Update 更新订单
 func (s *OrderService) Update(order *model.Order) error {
-	return s.db.Model(&model.Order{}).
-		Where("id = ?", order.ID).
-		Updates(map[string]interface{}{
-			"customer_id":      order.CustomerID,
-			"order_date":      order.OrderDate,
-			"status":          order.Status,
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		updates := map[string]interface{}{
+			"customer_id":       order.CustomerID,
+			"order_date":        order.OrderDate,
+			"status":            order.Status,
 			"total_cost_amount": order.TotalCostAmount,
 			"total_sale_amount": order.TotalSaleAmount,
-			"remarks":         order.Remarks,
-		}).Error
+			"remarks":           order.Remarks,
+		}
+		// 只有当 is_settled 为 true 时才更新，避免零值问题
+		if order.IsSettled {
+			updates["is_settled"] = true
+		}
+		err := tx.Model(&model.Order{}).
+			Where("id = ?", order.ID).
+			Updates(updates).Error
+		if err != nil {
+			return err
+		}
+
+		// 如果订单被标记为已结算，将所有财务记录标记为已结算
+		if order.IsSettled {
+			err = tx.Model(&model.FinancialTransaction{}).
+				Where("1 = 1").
+				Update("is_settled", true).Error
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }
 
 // UpdateStatus 更新订单状态
@@ -97,9 +119,24 @@ func (s *OrderService) Delete(id int64) error {
 
 // Settle 订单结算
 func (s *OrderService) Settle(id int64) error {
-	return s.db.Model(&model.Order{}).
-		Where("id = ?", id).
-		Update("is_settled", true).Error
+	return s.db.Transaction(func(tx *gorm.DB) error {
+		// 更新订单状态
+		err := tx.Model(&model.Order{}).
+			Where("id = ?", id).
+			Updates(map[string]interface{}{
+				"is_settled": true,
+				"status":    "delivering",
+			}).Error
+		if err != nil {
+			return err
+		}
+
+		// 将所有财务记录标记为已结算
+		err = tx.Model(&model.FinancialTransaction{}).
+			Where("1 = 1").
+			Update("is_settled", true).Error
+		return err
+	})
 }
 
 // GetByStatus 根据状态获取订单列表

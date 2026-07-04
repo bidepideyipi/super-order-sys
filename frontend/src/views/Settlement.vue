@@ -41,7 +41,7 @@
           <el-descriptions-item label="订单日期">{{ currentOrder.order_date }}</el-descriptions-item>
           <el-descriptions-item label="结算状态">
             <el-tag :type="currentOrder.is_settled ? 'success' : 'warning'">
-              {{ currentOrder.is_settled ? '已结算' : '未结算' }}
+              {{ currentOrder.is_settled ? '已结算' : '账面余额：￥' + latestBalance }}
             </el-tag>
           </el-descriptions-item>
         </el-descriptions>
@@ -97,7 +97,7 @@
         </el-table-column>
         <el-table-column label="结余" width="120" align="right">
           <template #default="{ row, $index }">
-            <div>¥{{ calculateBalance($index) }}</div>
+            <div>¥{{ currentOrder?.is_settled ? row.settled_amount.toFixed(2) : calculateBalance($index) }}</div>
           </template>
         </el-table-column>
       </el-table>

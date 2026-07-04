@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useSKUImage } from './useSKUImage';
 
 export function usePurchaseList() {
@@ -52,9 +52,10 @@ export function usePurchaseList() {
     loading.value = true;
     try {
       const result = await window.tauriAPI.purchase.getOrderItems(String(orderId));
-      orderItems.value = result;
-      await loadImageUrls(result);
-      return result;
+      const items = result.items || [];
+      orderItems.value = items;
+      await loadImageUrls(items);
+      return items;
     } catch (error) {
       console.error('加载订单明细失败:', error);
       ElMessage.error('加载订单明细失败');

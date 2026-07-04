@@ -76,7 +76,7 @@ func main() {
 	customerHandler := handler.NewCustomerHandler(customerService)
 	skuCategoryHandler := handler.NewSKUCategoryHandler(skuCategoryService)
 	skuHandler := handler.NewSKUHandler(skuService)
-	orderHandler := handler.NewOrderHandler(orderService)
+	orderHandler := handler.NewOrderHandler(orderService, financialTransactionService)
 	orderItemHandler := handler.NewOrderItemHandler(orderItemService)
 	financialHandler := handler.NewFinancialHandler(financialTransactionService)
 	commonHandler := handler.NewCommonHandler(skuService)
